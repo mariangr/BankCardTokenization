@@ -11,6 +11,9 @@ namespace BankCardTokenization.Server.Objects
         private string user;
         private string id;
 
+        /// <summary>
+        /// User that generated the token
+        /// </summary>
         public string User
         {
             get
@@ -26,6 +29,9 @@ namespace BankCardTokenization.Server.Objects
             }
         }
 
+        /// <summary>
+        /// Generated token
+        /// </summary>
         public string Id
         {
             get
@@ -41,18 +47,30 @@ namespace BankCardTokenization.Server.Objects
             }
         }
 
+        /// <summary>
+        /// General constructor
+        /// </summary>
+        /// <param name="number">Generated token</param>
+        /// <param name="username">User that generated token</param>
         public Token(string number, string username)
         {
             this.Id = number;
             this.User = username;
         }
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public Token()
             : this(string.Empty, string.Empty)
         {
 
         }
 
+        /// <summary>
+        /// Copy constructor
+        /// </summary>
+        /// <param name="token"></param>
         public Token(Token token)
             : this(token.Id, token.User)
         {

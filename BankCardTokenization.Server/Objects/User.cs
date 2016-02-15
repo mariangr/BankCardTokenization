@@ -7,12 +7,18 @@ using System.Threading.Tasks;
 
 namespace BankCardTokenization.Server.Objects
 {
+    /// <summary>
+    /// Class User that represents the User
+    /// </summary>
     public class User
     {
         private string username;
         private string password;
         private UserRightsEnum rights;
 
+        /// <summary>
+        /// Username of User
+        /// </summary>
         public string Username
         {
             get
@@ -28,6 +34,9 @@ namespace BankCardTokenization.Server.Objects
             }
         }
 
+        /// <summary>
+        /// Password of User
+        /// </summary>
         public string Password
         {
             get
@@ -43,6 +52,9 @@ namespace BankCardTokenization.Server.Objects
             }
         }
 
+        /// <summary>
+        /// User rights
+        /// </summary>
         public UserRightsEnum Rights
         {
             get
@@ -55,6 +67,12 @@ namespace BankCardTokenization.Server.Objects
             }
         }
 
+        /// <summary>
+        /// General constructor
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <param name="rights"></param>
         public User(string username, string password, UserRightsEnum rights)
         {
             this.Username = username;
@@ -62,12 +80,19 @@ namespace BankCardTokenization.Server.Objects
             this.Rights = rights;
         }
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public User()
             : this(String.Empty, String.Empty, UserRightsEnum.None)
         {
 
         }
 
+        /// <summary>
+        /// Copy constructor
+        /// </summary>
+        /// <param name="user"></param>
         public User(User user)
             : this(user.Username, user.Password, user.Rights)
         {

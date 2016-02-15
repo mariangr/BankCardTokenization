@@ -18,14 +18,24 @@ namespace BankCardTokenization.Server
 {
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// Server connection instance
+        /// </summary>
         private Server Server { get; set; }
 
+        /// <summary>
+        /// Constructor for Main Window
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
             this.Server = new Server(DisplayMessage,DisplayError);
         }
 
+        /// <summary>
+        /// Method for handling messages
+        /// </summary>
+        /// <param name="message"></param>
         private void DisplayMessage(string message)
         {
             if (!Dispatcher.CheckAccess())
@@ -34,10 +44,14 @@ namespace BankCardTokenization.Server
             }
             else
             {
-                this.txtMessages.Text += message.ToString() + '\n';
+                this.txtMessages.Text += string.Format("{0:MM/dd/yy H:mm:ss}: ", DateTime.Now) + message.ToString() + '\n';
             }
         }
 
+        /// <summary>
+        /// Method for handling errors
+        /// </summary>
+        /// <param name="errorDetails"></param>
         private void DisplayError(string errorDetails)
         {
             if (!Dispatcher.CheckAccess())
@@ -50,16 +64,31 @@ namespace BankCardTokenization.Server
             }
         }
 
+        /// <summary>
+        /// Click event for exporting tokens and cards ordered by token
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnExportByToken_Click(object sender, RoutedEventArgs e)
         {
             Server.ExportByToken();
         }
 
+        /// <summary>
+        /// Click event for exporting tokens and cards ordered by card
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnExportByBankCard_Click(object sender, RoutedEventArgs e)
         {
             Server.ExportByBankCard();
         }
 
+        /// <summary>
+        /// Closing event of Main Window.
+        /// Userd to save all data.
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnClosing(CancelEventArgs e)
         {
             this.Server.Dispose();

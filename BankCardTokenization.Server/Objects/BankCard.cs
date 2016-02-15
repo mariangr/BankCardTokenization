@@ -9,15 +9,20 @@ namespace BankCardTokenization.Server.Objects
     public class BankCard
     {
         private string id;
+        private List<Token> tokens;
 
+        /// <summary>
+        /// Bank card number
+        /// </summary>
         public string Id
         {
             get { return id; }
             set { id = value; }
         }
 
-        private List<Token> tokens;
-
+        /// <summary>
+        /// Tokens associated with bank card number
+        /// </summary>
         public List<Token> Tokens
         {
             get { return tokens; }
@@ -30,18 +35,30 @@ namespace BankCardTokenization.Server.Objects
             }
         }
 
+        /// <summary>
+        /// General constructor
+        /// </summary>
+        /// <param name="cardNumber">Bank card number</param>
+        /// <param name="tokens">Tokens</param>
         public BankCard(string cardNumber, List<Token> tokens)
         {
             this.Id = cardNumber;
-            this.Tokens = tokens;
+            this.Tokens = new List<Token>(tokens);
         }
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public BankCard()
             : this(string.Empty, new List<Token>())
         {
 
         }
 
+        /// <summary>
+        /// Copy constructor
+        /// </summary>
+        /// <param name="card"></param>
         public BankCard(BankCard card)
             : this(card.Id, card.Tokens)
         {

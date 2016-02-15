@@ -14,16 +14,46 @@ using System.Xml.Serialization;
 
 namespace BankCardTokenization.Server
 {
+    /// <summary>
+    /// Used for communication with clients.
+    /// </summary>
     internal class Server : IDisposable
     {
+        /// <summary>
+        /// The thread of the server
+        /// </summary>
         private Thread ServerThread { get; set; }
+
+        /// <summary>
+        /// Delegate for managing messages
+        /// </summary>
         private Action<string> ProcessMessage { get; set; }
+
+        /// <summary>
+        /// Delegate for managing errors
+        /// </summary>
         private Action<string> ProcessError { get; set; }
+
+        /// <summary>
+        /// All client connections
+        /// </summary>
         private List<Socket> Connections { get; set; }
 
+        /// <summary>
+        /// List of all users
+        /// </summary>
         public List<User> Users;
+
+        /// <summary>
+        /// List of all cards and tokens
+        /// </summary>
         public List<BankCard> BankCards;
 
+        /// <summary>
+        /// Constructor for serves
+        /// </summary>
+        /// <param name="processMessage">Action for managing message</param>
+        /// <param name="processError">Actions for managing error messages</param>
         public Server(Action<string> processMessage, Action<string> processError)
         {
             if (processMessage == null || processError == null)
@@ -38,31 +68,45 @@ namespace BankCardTokenization.Server
             this.InitializeServer();
         }
 
+        /// <summary>
+        /// Method for initializing the server
+        /// </summary>
         public void InitializeServer()
         {
+            //Start new thread for server
             this.ServerThread = new Thread(new ThreadStart(RunServer));
             this.ServerThread.Start();
         }
 
+        /// <summary>
+        /// Method for running the server and accepting connections
+        /// </summary>
         public void RunServer()
         {
             TcpListener listener;
-            int connectionCounter = 0;
             try
             {
+                //Initialize the listener and start it
                 IPAddress address = IPAddress.Parse(Constants.LOCALHOST);
                 listener = new TcpListener(address, Constants.PORT);
                 listener.Start();
+
+                //Notify listener has started
                 ProcessMessage(Constants.WAITING_FOR_CONNECTIONS);
 
                 while (true)
                 {
+                    //Get new connection
                     Socket newConnection = listener.AcceptSocket();
+                    //save connection
                     this.Connections.Add(newConnection);
+                    //create new client processor for the new conection
                     ClientProcessor processor = new ClientProcessor(ProcessMessage, ProcessError, Users, BankCards);
 
+                    //Run client processor on new thread
                     ThreadPool.QueueUserWorkItem(new WaitCallback(processor.ProcessClient), newConnection);
 
+                    //Notify accepted connection
                     ProcessMessage(string.Format(Constants.ACCEPTED_CONNECTION, this.Connections.Where(c => c.Connected).Count()));
                 }
             }
@@ -72,6 +116,9 @@ namespace BankCardTokenization.Server
             }
         }
 
+        /// <summary>
+        /// Method to load data of the server (users and cards and tokens)
+        /// </summary>
         private void LoadData()
         {
             try
@@ -89,6 +136,13 @@ namespace BankCardTokenization.Server
             }
         }
 
+        /// <summary>
+        /// Generic method to load data from xml files
+        /// </summary>
+        /// <typeparam name="T">Type of the data stored in the xml file</typeparam>
+        /// <param name="type">Type of the data stored in the xml file</param>
+        /// <param name="filePath">Path of the file</param>
+        /// <param name="data">Reference to object that will store the data in the system</param>
         private void LoadXml<T>(Type type, string filePath, ref T data) where T : new()
         {
             try
@@ -101,6 +155,7 @@ namespace BankCardTokenization.Server
             }
             catch (FileNotFoundException)
             {
+                //if file does not exist then create new collection
                 data = new T();
             }
             catch (Exception e)
@@ -109,6 +164,9 @@ namespace BankCardTokenization.Server
             }
         }
 
+        /// <summary>
+        /// Method to save data of the server
+        /// </summary>
         private void SaveData()
         {
             try
@@ -122,6 +180,13 @@ namespace BankCardTokenization.Server
             }
         }
 
+        /// <summary>
+        /// Generic method for saving the data in the system
+        /// </summary>
+        /// <typeparam name="T">Type of the data stored in the xml file</typeparam>
+        /// <param name="type">Type of the data stored in the xml file</param>
+        /// <param name="filePath">Path of the file</param>
+        /// <param name="data">Data to be stored</param>
         private void SaveXml<T>(Type type, string filePath, List<T> data)
         {
             try
@@ -139,11 +204,17 @@ namespace BankCardTokenization.Server
             }
         }
 
+        /// <summary>
+        /// Method used to dispose of the server and save all data on close
+        /// </summary>
         public void Dispose()
         {
             this.SaveData();
         }
 
+        /// <summary>
+        /// Method for exporting Tokens and cards ordered by card
+        /// </summary>
         public void ExportByBankCard()
         {
             string filePath = string.Empty;
@@ -176,6 +247,9 @@ namespace BankCardTokenization.Server
             }
         }
 
+        /// <summary>
+        /// Method for exporting Tokens and cards ordered by token
+        /// </summary>
         public void ExportByToken()
         {
             string filePath = string.Empty;
