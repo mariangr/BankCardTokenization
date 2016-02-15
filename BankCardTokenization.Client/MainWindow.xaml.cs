@@ -137,5 +137,10 @@ namespace BankCardTokenization.Client
             Client.Logout();
             ToggleControls();
         }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            this.Client.Dispose();
+        }
     }
 }

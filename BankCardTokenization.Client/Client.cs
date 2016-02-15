@@ -11,7 +11,7 @@ using Xceed.Wpf.Toolkit;
 
 namespace BankCardTokenization.Client
 {
-    public class Client
+    public class Client : IDisposable
     {
         private TcpClient TcpClient { get; set; }
         public Action<string> ProcessMessage { get; set; }
@@ -123,6 +123,12 @@ namespace BankCardTokenization.Client
         {
             BinaryWriter.Write((int)ActionEnum.Logout);
             return BinaryReader.ReadBoolean();
+        }
+
+        public void Dispose()
+        {
+            this.BinaryWriter.Write((int)ActionEnum.Disconnect);
+            this.TcpClient.Close();
         }
     }
 }

@@ -31,5 +31,8 @@ namespace BankCardTokenization.Common
         public static readonly string USER_HAS_CREATED_TOKEN = "User {0} has generated a token!";
         public static readonly string BANK_CARD_NOT_FOUND = "There is no bank card associated with the given token!";
         public static readonly string USER_HAS_REQUESTED_BANK_NUMBER = "User {0} has requested a bank number!";
+        public static readonly string USER_HAS_LOGGED_OUT = "User {0} has logged out!";
+        public static readonly string USER_HAS_DISCONNECTED = "User {0} hase disconnected!";
+        public static readonly string CONNECTION_CLOSED = "Connection has been closed!";
     }
 }

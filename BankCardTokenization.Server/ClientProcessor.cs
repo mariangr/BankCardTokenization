@@ -41,9 +41,21 @@ namespace BankCardTokenization.Server
 
                 user = AuthenticateUser();
 
-                while (clientSocket.Connected)
+                if (user != null)
                 {
-                    ProcessRequest();
+                    while (clientSocket.Connected)
+                    {
+                        if (!ProcessRequest())
+                        {
+                            clientSocket.Close();
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    clientSocket.Close();
+                    ProcessMessage(Constants.CONNECTION_CLOSED);
                 }
             }
             catch (Exception e)
@@ -55,7 +67,7 @@ namespace BankCardTokenization.Server
             }
         }
 
-        private void ProcessRequest()
+        private bool ProcessRequest()
         {
             ActionEnum currentAction = ((ActionEnum)reader.ReadInt32());
 
@@ -69,14 +81,24 @@ namespace BankCardTokenization.Server
             }
             else if (currentAction == ActionEnum.Logout)
             {
+                ProcessMessage(string.Format(Constants.USER_HAS_LOGGED_OUT, user.Username));
                 this.user = null;
                 writer.Write(true);
                 user = AuthenticateUser();
+                return false;
+            }
+            else if (currentAction == ActionEnum.Disconnect)
+            {
+                ProcessMessage(string.Format(Constants.USER_HAS_DISCONNECTED, user.Username));
+                this.user = null;
+                return false;
             }
             else
             {
                 writer.Write((int)ActionEnum.Denied);
             }
+
+            return true;
         }
 
         private void GenerateToken()
@@ -170,6 +192,8 @@ namespace BankCardTokenization.Server
                     return LoginUser();
                 case ActionEnum.Register:
                     return RegisterUser();
+                case ActionEnum.Disconnect:
+                    return null;
                 default:
                     throw new InvalidOperationException(Constants.INVALID_OPERATION);
             }

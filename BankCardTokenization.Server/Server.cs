@@ -19,6 +19,7 @@ namespace BankCardTokenization.Server
         private Thread ServerThread { get; set; }
         private Action<string> ProcessMessage { get; set; }
         private Action<string> ProcessError { get; set; }
+        private List<Socket> Connections { get; set; }
 
         public List<User> Users;
         public List<BankCard> BankCards;
@@ -32,6 +33,7 @@ namespace BankCardTokenization.Server
 
             this.ProcessMessage = processMessage;
             this.ProcessError = processError;
+            this.Connections = new List<Socket>();
             this.LoadData();
             this.InitializeServer();
         }
@@ -56,12 +58,12 @@ namespace BankCardTokenization.Server
                 while (true)
                 {
                     Socket newConnection = listener.AcceptSocket();
-
+                    this.Connections.Add(newConnection);
                     ClientProcessor processor = new ClientProcessor(ProcessMessage, ProcessError, Users, BankCards);
 
                     ThreadPool.QueueUserWorkItem(new WaitCallback(processor.ProcessClient), newConnection);
 
-                    ProcessMessage(string.Format(Constants.ACCEPTED_CONNECTION, ++connectionCounter));
+                    ProcessMessage(string.Format(Constants.ACCEPTED_CONNECTION, this.Connections.Where(c => c.Connected).Count()));
                 }
             }
             catch (Exception e)
